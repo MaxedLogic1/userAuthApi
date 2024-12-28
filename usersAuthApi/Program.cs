@@ -21,7 +21,6 @@ builder.Services.AddDbContext<userDbContext>(options =>
 options.UseSqlServer(builder.Configuration.GetConnectionString("UserConnetionString")));
 
 var app = builder.Build();
-
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
