@@ -14,6 +14,7 @@ namespace usersAuthApi.ApplicationDbContext
         public DbSet<GamesModel> Tab_Games { get; set; }
         public DbSet<BubbleGameIndexModel> Tab_BubbleGameIndex { get; set; }
         public DbSet<BubbleGameModel> Tab_BubbleGame { get; set; }
+        public DbSet<HeadTailGameIndexModel> Tab_HeadTailGameIndex {  get; set; }
 
     }
 }

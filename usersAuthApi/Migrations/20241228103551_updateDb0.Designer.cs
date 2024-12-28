@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using usersAuthApi.ApplicationDbContext;
 
@@ -11,9 +12,11 @@ using usersAuthApi.ApplicationDbContext;
 namespace usersAuthApi.Migrations
 {
     [DbContext(typeof(userDbContext))]
-    partial class userDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241228103551_updateDb0")]
+    partial class updateDb0
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -231,7 +234,7 @@ namespace usersAuthApi.Migrations
                         .HasColumnType("bit");
 
                     b.Property<decimal>("Loss")
-                        .HasColumnType("decimal(18, 2)");
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("PId")
                         .HasColumnType("int");
@@ -252,7 +255,7 @@ namespace usersAuthApi.Migrations
                         .HasColumnType("int");
 
                     b.Property<decimal>("Win")
-                        .HasColumnType("decimal(18, 2)");
+                        .HasColumnType("decimal(18,2)");
 
                     b.HasKey("Id");
 

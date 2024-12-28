@@ -20,8 +20,10 @@ namespace usersAuthApi.Models.Domain
         public string? Images { get; set; } 
 
         public int PId { get; set; }
-
+        public int? GId { get; set; }
+        [ForeignKey("GId")]
+        public GamesModel? Games { get; set; }
         [ForeignKey("PId")]
-        public UserModel User { get; set; }
+        public UserModel? User { get; set; }
     }
 }

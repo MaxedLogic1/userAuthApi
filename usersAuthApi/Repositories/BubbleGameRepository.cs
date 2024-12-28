@@ -14,7 +14,7 @@ namespace usersAuthApi.Repositories
         {
             _userDbContext = userDbContext;
         }
-    
+
         public async Task<BubbleGameResponseDto> BubbleGameResponse(BubbleGameRequestDto bubbleGameRequestDto)
         {
 
@@ -73,8 +73,6 @@ namespace usersAuthApi.Repositories
 
             decimal resultAmount = isWin ? betAmount * 2 : betAmount;
 
-
-
             string resultMessage = isWin ? $"Congratulations, You Win: {resultAmount}" : $"Sorry, You Lost: {resultAmount}";
 
             //Total Amount 
@@ -98,19 +96,15 @@ namespace usersAuthApi.Repositories
             await _userDbContext.Tab_FundTransaction.AddAsync(fundTransaction);
             await _userDbContext.SaveChangesAsync();
 
-            //var playerName = await _userDbContext.Tab_Register
-            //            .Where(u => u.Id == bubbleGameRequestDto.PId)
-            //            .Select(u => u.UserName)  
-            //            .FirstOrDefaultAsync();
-            //response Dto to sho on the response body
-
             var newPlayGame = new BubbleGameIndexModel
             {
-                RandomId = $"PGame_{new Random().Next(1000, 9999)}",
+                RandomId = $"BGame_{new Random().Next(1000, 9999)}",
                 PId = bubbleGameRequestDto.PId,
                 GId = bubbleGameRequestDto.GId,
                 BetAmount = bubbleGameRequestDto.BetAmount,
-                WinLoss = isWin ? "win":"loss",
+                Type = isWin ? "Win" : "Loss",
+                Win = isWin ? resultAmount : 0,
+                Loss = isWin ? 0 : resultAmount,
                 Remark = $"Game: {game.Name}, Player: {player.UserName} ",
                 IsActive = true,
                 EntryDate = DateTime.Now
@@ -118,10 +112,6 @@ namespace usersAuthApi.Repositories
 
             await _userDbContext.Tab_BubbleGameIndex.AddAsync(newPlayGame);
             await _userDbContext.SaveChangesAsync();
-
-
-
-
             var responseDto = new BubbleGameResponseDto
             {
                 PId = bubbleGameRequestDto.PId,
@@ -132,8 +122,6 @@ namespace usersAuthApi.Repositories
                 TotalAmount = currentAmount
 
             };
-            //await _userDbContext.Tab_BubbleGameIndex.AddAsync(responseDto);
-            //await _userDbContext.SaveChangesAsync();
             return responseDto;
         }
     }

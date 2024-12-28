@@ -12,8 +12,8 @@ using usersAuthApi.ApplicationDbContext;
 namespace usersAuthApi.Migrations
 {
     [DbContext(typeof(userDbContext))]
-    [Migration("20241226071156_Addtotalamouont")]
-    partial class Addtotalamouont
+    [Migration("20241228100643_123")]
+    partial class _123
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -24,6 +24,61 @@ namespace usersAuthApi.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+
+            modelBuilder.Entity("usersAuthApi.Models.Domain.BubbleGameIndexModel", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal>("BetAmount")
+                        .HasColumnType("money");
+
+                    b.Property<DateTime>("EntryDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("GId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<decimal>("Loss")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("PId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("RandomId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Remark")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("Win")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<string>("name")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("GId");
+
+                    b.HasIndex("PId");
+
+                    b.ToTable("Tab_BubbleGameIndex");
+                });
 
             modelBuilder.Entity("usersAuthApi.Models.Domain.BubbleGameModel", b =>
                 {
@@ -79,8 +134,10 @@ namespace usersAuthApi.Migrations
                     b.Property<decimal>("DebitAmount")
                         .HasColumnType("money");
 
+                    b.Property<int?>("GId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Images")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("PId")
@@ -89,9 +146,6 @@ namespace usersAuthApi.Migrations
                     b.Property<string>("Remark")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
-
-                    b.Property<decimal>("TotalAmount")
-                        .HasColumnType("decimal(18,2)");
 
                     b.Property<DateTime>("TransactionDate")
                         .HasColumnType("datetime2");
@@ -105,6 +159,8 @@ namespace usersAuthApi.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("GId");
 
                     b.HasIndex("PId");
 
@@ -155,7 +211,7 @@ namespace usersAuthApi.Migrations
                     b.ToTable("Tab_Games");
                 });
 
-            modelBuilder.Entity("usersAuthApi.Models.Domain.PlayGameModel", b =>
+            modelBuilder.Entity("usersAuthApi.Models.Domain.HeadTailGameIndexModel", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -164,7 +220,10 @@ namespace usersAuthApi.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<decimal>("BetAmount")
-                        .HasColumnType("money");
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<bool>("BetSide")
+                        .HasColumnType("bit");
 
                     b.Property<DateTime>("EntryDate")
                         .HasColumnType("datetime2");
@@ -172,8 +231,14 @@ namespace usersAuthApi.Migrations
                     b.Property<int>("GId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("GamesId")
+                        .HasColumnType("int");
+
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
+
+                    b.Property<decimal>("Loss")
+                        .HasColumnType("decimal(18,2)");
 
                     b.Property<int>("PId")
                         .HasColumnType("int");
@@ -184,48 +249,25 @@ namespace usersAuthApi.Migrations
 
                     b.Property<string>("Remark")
                         .IsRequired()
-                        .HasMaxLength(500)
-                        .HasColumnType("nvarchar(500)");
+                        .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("WinLoss")
+                    b.Property<string>("Type")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.HasKey("Id");
-
-                    b.HasIndex("GId");
-
-                    b.HasIndex("PId");
-
-                    b.ToTable("Tab_PlayGame");
-                });
-
-            modelBuilder.Entity("usersAuthApi.Models.Domain.PlayerTotalFund", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
+                    b.Property<int?>("UserId")
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("EntryDate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<int>("PId")
-                        .HasColumnType("int");
-
-                    b.Property<string>("RandomId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<decimal>("TotalFund")
-                        .HasColumnType("money");
+                    b.Property<decimal>("Win")
+                        .HasColumnType("decimal(18,2)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("PId");
+                    b.HasIndex("GamesId");
 
-                    b.ToTable("Tab_PlayerTotalFund");
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Tab_HeadTailGameIndex");
                 });
 
             modelBuilder.Entity("usersAuthApi.Models.Domain.UserModel", b =>
@@ -263,29 +305,7 @@ namespace usersAuthApi.Migrations
                     b.ToTable("Tab_Register");
                 });
 
-            modelBuilder.Entity("usersAuthApi.Models.Domain.BubbleGameModel", b =>
-                {
-                    b.HasOne("usersAuthApi.Models.Domain.UserModel", "User")
-                        .WithMany()
-                        .HasForeignKey("PId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("usersAuthApi.Models.Domain.FundTransactionModel", b =>
-                {
-                    b.HasOne("usersAuthApi.Models.Domain.UserModel", "User")
-                        .WithMany()
-                        .HasForeignKey("PId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("usersAuthApi.Models.Domain.PlayGameModel", b =>
+            modelBuilder.Entity("usersAuthApi.Models.Domain.BubbleGameIndexModel", b =>
                 {
                     b.HasOne("usersAuthApi.Models.Domain.GamesModel", "Game")
                         .WithMany()
@@ -304,13 +324,45 @@ namespace usersAuthApi.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("usersAuthApi.Models.Domain.PlayerTotalFund", b =>
+            modelBuilder.Entity("usersAuthApi.Models.Domain.BubbleGameModel", b =>
                 {
                     b.HasOne("usersAuthApi.Models.Domain.UserModel", "User")
                         .WithMany()
                         .HasForeignKey("PId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("usersAuthApi.Models.Domain.FundTransactionModel", b =>
+                {
+                    b.HasOne("usersAuthApi.Models.Domain.GamesModel", "Games")
+                        .WithMany()
+                        .HasForeignKey("GId");
+
+                    b.HasOne("usersAuthApi.Models.Domain.UserModel", "User")
+                        .WithMany()
+                        .HasForeignKey("PId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Games");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("usersAuthApi.Models.Domain.HeadTailGameIndexModel", b =>
+                {
+                    b.HasOne("usersAuthApi.Models.Domain.GamesModel", "Games")
+                        .WithMany()
+                        .HasForeignKey("GamesId");
+
+                    b.HasOne("usersAuthApi.Models.Domain.UserModel", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId");
+
+                    b.Navigation("Games");
 
                     b.Navigation("User");
                 });

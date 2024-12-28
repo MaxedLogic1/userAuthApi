@@ -12,8 +12,8 @@ using usersAuthApi.ApplicationDbContext;
 namespace usersAuthApi.Migrations
 {
     [DbContext(typeof(userDbContext))]
-    [Migration("20241227053352_removePlayedGame")]
-    partial class removePlayedGame
+    [Migration("20241228093653_addcoltoDb")]
+    partial class addcoltoDb
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -45,6 +45,9 @@ namespace usersAuthApi.Migrations
                     b.Property<bool>("IsActive")
                         .HasColumnType("bit");
 
+                    b.Property<decimal>("Loss")
+                        .HasColumnType("decimal(18,2)");
+
                     b.Property<int>("PId")
                         .HasColumnType("int");
 
@@ -57,9 +60,12 @@ namespace usersAuthApi.Migrations
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
-                    b.Property<string>("WinLoss")
+                    b.Property<string>("Type")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<decimal>("Win")
+                        .HasColumnType("decimal(18,2)");
 
                     b.HasKey("Id");
 
@@ -124,6 +130,9 @@ namespace usersAuthApi.Migrations
                     b.Property<decimal>("DebitAmount")
                         .HasColumnType("money");
 
+                    b.Property<int?>("GId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Images")
                         .HasColumnType("nvarchar(max)");
 
@@ -146,6 +155,8 @@ namespace usersAuthApi.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("GId");
 
                     b.HasIndex("PId");
 
@@ -194,6 +205,65 @@ namespace usersAuthApi.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Tab_Games");
+                });
+
+            modelBuilder.Entity("usersAuthApi.Models.Domain.HeadTailGameIndexModel", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<decimal>("BetAmount")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<bool>("BetSide")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("EntryDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("GId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("GamesId")
+                        .HasColumnType("int");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<decimal>("Loss")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.Property<int>("PId")
+                        .HasColumnType("int");
+
+                    b.Property<string>("RandomId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Remark")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("UserId")
+                        .HasColumnType("int");
+
+                    b.Property<decimal>("Win")
+                        .HasColumnType("decimal(18,2)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("GamesId");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Tab_HeadTailGameIndex");
                 });
 
             modelBuilder.Entity("usersAuthApi.Models.Domain.UserModel", b =>
@@ -263,11 +333,32 @@ namespace usersAuthApi.Migrations
 
             modelBuilder.Entity("usersAuthApi.Models.Domain.FundTransactionModel", b =>
                 {
+                    b.HasOne("usersAuthApi.Models.Domain.GamesModel", "Games")
+                        .WithMany()
+                        .HasForeignKey("GId");
+
                     b.HasOne("usersAuthApi.Models.Domain.UserModel", "User")
                         .WithMany()
                         .HasForeignKey("PId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Games");
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("usersAuthApi.Models.Domain.HeadTailGameIndexModel", b =>
+                {
+                    b.HasOne("usersAuthApi.Models.Domain.GamesModel", "Games")
+                        .WithMany()
+                        .HasForeignKey("GamesId");
+
+                    b.HasOne("usersAuthApi.Models.Domain.UserModel", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId");
+
+                    b.Navigation("Games");
 
                     b.Navigation("User");
                 });
