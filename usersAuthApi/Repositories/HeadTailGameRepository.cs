@@ -18,22 +18,19 @@ namespace usersAuthApi.Repositories
 
         public async Task<HeadTailGameResponseDto> HeadTailGameResponse(HeadTailGameReuestDto headTailGameReuestDto)
         {
-
-
             if (headTailGameReuestDto == null)
             {
                 throw new InvalidOperationException("HeadTail Model Can't be Null ?");
             }
-
             //player is exsit
             var player = await _userDbContext.Tab_Register
               .Where(u => u.Id == headTailGameReuestDto.PId)
               .FirstOrDefaultAsync();
-
             if (player == null)
             {
                 throw new InvalidOperationException("Player not found.");
             }
+
             //find the game 
             var game = await _userDbContext.Tab_Games
                 .Where(g => g.Id == headTailGameReuestDto.GId)
@@ -51,7 +48,7 @@ namespace usersAuthApi.Repositories
                  .Select(g => (decimal?)(g.Sum(f => (decimal?)f.CreditAmount) ?? 0) - (g.Sum(f => (decimal?)f.DebitAmount) ?? 0))
                  .FirstOrDefaultAsync() ?? 0;
 
-            if (totalAmount >= headTailGameReuestDto.BetAmount)
+            if (totalAmount <= headTailGameReuestDto.BetAmount)
             {
                 return new HeadTailGameResponseDto
                 {
@@ -61,12 +58,9 @@ namespace usersAuthApi.Repositories
                     EntryDate = DateTime.Now,
                 };
             }
-            if (headTailGameReuestDto.BetSide == null)
-            {
-                throw new InvalidOperationException("Bet Side Cannot be Null");
-            }
             //headtailGame Logic 
             bool isWin = headTailGameReuestDto.BetSide;
+                         isWin = false;
             decimal totalCreditAmount = await _userDbContext.Tab_FundTransaction
                               .Where(f => f.PId == headTailGameReuestDto.PId)
                               .SumAsync(f => (decimal?)f.CreditAmount) ?? 0;
@@ -101,11 +95,12 @@ namespace usersAuthApi.Repositories
             //add new row to the transection table 
             var fundTransaction = new FundTransactionModel
             {
+                GId = headTailGameReuestDto.GId,
                 PId = headTailGameReuestDto.PId,
                 CreditAmount = isWin ? resultAmount : 0,
                 DebitAmount = isWin ? 0 : resultAmount,
                 Remark = resultMessage,
-                Type = isWin ? "win" : "loss",
+                Type = isWin ? "Win" : "Loss",
                 TransactionDate = DateTime.Now,
                 TxNoId = $"TX_{new Random().Next(1000, 9999)}",
                 Images = null

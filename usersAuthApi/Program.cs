@@ -15,6 +15,7 @@ builder.Services.AddScoped<IGameRepository, GameRepository>();
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
 builder.Services.AddScoped<IFundRepository, FundRepository>();
 builder.Services.AddScoped<IBubbleGameRepository, BubbleGameRepository>();
+builder.Services.AddScoped<IHeadTailGameRepository, HeadTailGameRepository>();
 
 // Connections String 
 builder.Services.AddDbContext<userDbContext>(options => 

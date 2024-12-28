@@ -61,6 +61,7 @@ namespace usersAuthApi.Repositories
 
             var fundTransaction = new FundTransactionModel
             {
+                GId = null,
                 PId = requestDto.PId,
                 CreditAmount = requestDto.CreditAmount,
                 Remark = requestDto.Remark,

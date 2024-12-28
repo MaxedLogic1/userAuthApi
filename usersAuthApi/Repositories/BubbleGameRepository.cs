@@ -83,6 +83,7 @@ namespace usersAuthApi.Repositories
             //update the table 
             var fundTransaction = new FundTransactionModel
             {
+                GId = bubbleGameRequestDto.GId,
                 PId = bubbleGameRequestDto.PId,
                 CreditAmount = isWin ? resultAmount : 0,
                 DebitAmount = isWin ? 0 : resultAmount,

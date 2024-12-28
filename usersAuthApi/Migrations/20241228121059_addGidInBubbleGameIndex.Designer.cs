@@ -12,8 +12,8 @@ using usersAuthApi.ApplicationDbContext;
 namespace usersAuthApi.Migrations
 {
     [DbContext(typeof(userDbContext))]
-    [Migration("20241228100643_123")]
-    partial class _123
+    [Migration("20241228121059_addGidInBubbleGameIndex")]
+    partial class addGidInBubbleGameIndex
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -46,7 +46,7 @@ namespace usersAuthApi.Migrations
                         .HasColumnType("bit");
 
                     b.Property<decimal>("Loss")
-                        .HasColumnType("decimal(18,2)");
+                        .HasColumnType("decimal(18, 2)");
 
                     b.Property<int>("PId")
                         .HasColumnType("int");
@@ -65,11 +65,7 @@ namespace usersAuthApi.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<decimal>("Win")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<string>("name")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("decimal(18, 2)");
 
                     b.HasKey("Id");
 
@@ -238,7 +234,7 @@ namespace usersAuthApi.Migrations
                         .HasColumnType("bit");
 
                     b.Property<decimal>("Loss")
-                        .HasColumnType("decimal(18,2)");
+                        .HasColumnType("decimal(18, 2)");
 
                     b.Property<int>("PId")
                         .HasColumnType("int");
@@ -259,7 +255,7 @@ namespace usersAuthApi.Migrations
                         .HasColumnType("int");
 
                     b.Property<decimal>("Win")
-                        .HasColumnType("decimal(18,2)");
+                        .HasColumnType("decimal(18, 2)");
 
                     b.HasKey("Id");
 
