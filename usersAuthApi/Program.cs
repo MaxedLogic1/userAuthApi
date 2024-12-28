@@ -6,28 +6,21 @@ using usersAuthApi.Repositories;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
 builder.Services.AddControllers();
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 //Add Repository
-builder.Services.AddScoped<IGameRepository, GameRepository>();
-//builder.Services.AddScoped<IPlayedGameRepository, PlayedGameRepository>();
+builder.Services.AddScoped<IGameRepository, GameRepository>();    
 builder.Services.AddScoped<IAuthRepository, AuthRepository>();
 builder.Services.AddScoped<IFundRepository, FundRepository>();
 builder.Services.AddScoped<IBubbleGameRepository, BubbleGameRepository>();
-
 
 // Connections String 
 builder.Services.AddDbContext<userDbContext>(options => 
 options.UseSqlServer(builder.Configuration.GetConnectionString("UserConnetionString")));
 
-
 var app = builder.Build();
-
-
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -36,17 +29,10 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 app.UseStaticFiles();
-//app.UseStaticFiles(new StaticFileOptions
-//{
-//    FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "Images")),
-//    RequestPath = "/uploads"
-//});
 app.UseHttpsRedirection();
 
 app.UseAuthorization();
 
 app.MapControllers();
-//app.UseMiddleware<requestLoggingMiddleware>();
 app.UseMiddleware<globalExceptionMiddleware>();
-
 app.Run();
