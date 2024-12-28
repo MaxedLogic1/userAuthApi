@@ -15,8 +15,6 @@ namespace usersAuthApi.Models.Domain
         public bool IsActive { get; set; }
         public string RandomId { get; set; }
 
-
-
         public DateTime EntryDate { get; set; }
        
 
