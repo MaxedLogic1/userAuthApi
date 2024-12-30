@@ -60,30 +60,44 @@ namespace usersAuthApi.Repositories
             }
             //headtailGame Logic 
             bool isWin = headTailGameReuestDto.BetSide;
-                         isWin = false;
+            
             decimal totalCreditAmount = await _userDbContext.Tab_FundTransaction
-                              .Where(f => f.PId == headTailGameReuestDto.PId)
+                              .Where(f => f.PId == headTailGameReuestDto.PId )
                               .SumAsync(f => (decimal?)f.CreditAmount) ?? 0;
 
             decimal totalDebitAmount = await _userDbContext.Tab_FundTransaction
                               .Where(f => f.PId == headTailGameReuestDto.PId)
                               .SumAsync(f => (decimal?)f.DebitAmount) ?? 0;
-            if(totalDebitAmount > totalCreditAmount)
-            {
-                isWin=true;
-            }
-            else if(totalCreditAmount == totalDebitAmount)
-            {
-                isWin = true;
 
-            }
-            else if( totalCreditAmount > totalDebitAmount)
+            isWin = new Random().Next(100) % 2 == 0;
+            if (isWin == false)
             {
                 isWin = false;
             }
+            else
+            {
+                isWin = true;
+            }
+
+            //if (totalDebitAmount > totalCreditAmount)
+            //{
+            //    isWin=true;
+            //}
+            //else if(totalCreditAmount == totalDebitAmount)
+            //{
+            //    isWin = true;
+
+            //}
+            //else if( totalCreditAmount > totalDebitAmount)
+            //{
+            //    isWin = false;
+            //}
             decimal betAmount = headTailGameReuestDto.BetAmount;
 
-            decimal resultAmount = isWin ? betAmount * 2 : betAmount;
+            //Give the 20% of bet Amount to the user 
+            double winingAmount = 0.20;
+
+            decimal resultAmount = isWin ? betAmount * (decimal)winingAmount : betAmount;
 
 
             //Remark message to 

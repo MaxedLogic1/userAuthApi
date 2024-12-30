@@ -40,7 +40,7 @@ namespace usersAuthApi.Repositories
 
             var uniqueFileName = $"Photo_{new Random().Next(1000, 9999)}{fileExtension}";
 
-            var uploadDirectory = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot/Images");
+            var uploadDirectory = Path.Combine(Directory.GetCurrentDirectory(), "Images");
 
             if (!Directory.Exists(uploadDirectory))
             {
@@ -90,7 +90,7 @@ namespace usersAuthApi.Repositories
                 TransactionDate = fundTransaction.TransactionDate,
                 Type = fundTransaction.Type,
                 TxNoId = fundTransaction.TxNoId,
-                Image = $"/userAuthApi/wwwroot/Images/{uniqueFileName}"
+                Image = $"/userAuthApi/Images/{uniqueFileName}"
             };
 
             return responseDto;
