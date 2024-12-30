@@ -7,7 +7,9 @@ namespace usersAuthApi.Models.DTO
     {
 
         public int PId { get; set; }
+        public string? PlayeName { get; set; }
         public int GId { get; set; }
+        public string? GameName { get; set; }
         public decimal BetAmount { get; set; }
         public DateTime EntryDate { get; set; }
         public string Message { get; set; }

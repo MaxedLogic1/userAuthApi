@@ -12,6 +12,8 @@ namespace usersAuthApi.Models.DTO
         public decimal BetAmount { get; set; }
         [Required]
         public bool BetSide { get; set; }
+        [Required]
+        public DateTime BetEntryDate { get; set; }
 
     }
 }

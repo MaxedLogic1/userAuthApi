@@ -1,5 +1,4 @@
-﻿using usersAuthApi.ApplicationDbContext;
-using usersAuthApi.Models.DTO;
+﻿using usersAuthApi.Models.DTO;
 
 namespace usersAuthApi.Repositories
 {
@@ -9,5 +8,6 @@ namespace usersAuthApi.Repositories
       Task<HeadTailGameResponseDto> HeadTailGameResponse(HeadTailGameReuestDto headTailGameReuestDto);
 
 
+        Task<List<HeadTailGameResponseDto>> MultiUserHeadTailGameResponse(HeadTailGameMultiUsersRequestDto headTailGameMultiUsersRequestDto);
     }
 }
