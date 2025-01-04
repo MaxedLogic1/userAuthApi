@@ -9,8 +9,8 @@
         public string Remark { get; set; }
          public DateTime TransactionDate { get; set; }
         public string Type { get; set; }
-        public string TxNoId { get; set; }
-        public string? Image { get; set; }
+        //public string TxNoId { get; set; }
+        //public string? Image { get; set; }
 
     }
 }

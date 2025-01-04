@@ -7,6 +7,7 @@ namespace usersAuthApi.Repositories
     {
 
       Task<BubbleGameResponseDto> BubbleGameResponse(BubbleGameRequestDto bubbleGameRequestDto);
+      
 
 
     }

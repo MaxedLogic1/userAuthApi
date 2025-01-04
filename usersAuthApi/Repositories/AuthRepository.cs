@@ -13,13 +13,14 @@ namespace usersAuthApi.Repositories
         {
             _userDbContext = userDbContext;
         }
+       
 
-        public async Task<string> RegisterUserAsync(registerRequestDto registerDto)
+        public async Task<UserModel> RegisterUserAsync(registerRequestDto registerDto)
         {
-            var checkEmail = await _userDbContext.Tab_Register.AnyAsync(u => u.UserName == registerDto.UserName);
-            if (checkEmail)
+            var checkEmail = await _userDbContext.Tab_Register.FirstOrDefaultAsync(u => u.UserName == registerDto.UserName);
+            if (checkEmail !=null)
             {
-                throw new Exception("Email already Exist.");
+                return null;
             }
 
 
@@ -31,57 +32,48 @@ namespace usersAuthApi.Repositories
                 UserName = registerDto.UserName,
                 Password = registerDto.Password,
                 IsActive = true,
-                EntryDate = DateTime.Now
+                EntryDate = DateTime.UtcNow.AddMinutes(330)
             };
 
             _userDbContext.Tab_Register.Add(newUser);
             await _userDbContext.SaveChangesAsync();
 
-            return $"{registerDto.Name} Register Successfully:";
+            //
+            return newUser;
         }
 
         public async Task<loginResponseDto> LoginUserAsync(loginRequestDto loginDto)
         {
-            if (loginDto == null)
-            {
-                throw new UnauthorizedAccessException("Please Enter the Values");
-            }
-
             var user = await _userDbContext.Tab_Register.SingleOrDefaultAsync(u => u.UserName == loginDto.UserName && u.Password == loginDto.Password);
 
             if (user == null)
             {
-                throw new UnauthorizedAccessException("Invalid credentials.");
+                return null;
             }
 
             return new loginResponseDto
             {
                 Id = user.Id,
                 Name=user.Name,
-                IsActive = user.IsActive,
-                RandomId = user.RandomId,
+              //  IsActive = user.IsActive,
+                //RandomId = user.RandomId,
                 UserName= user.UserName,
                 EntryDate =user.EntryDate
-
             };
-
         }
 
-        public async Task<string> ForgetPasswordAsync(forgetPasswordDto forget_PasswordDto)
+        public async Task<UserModel> ForgetPasswordAsync(forgetPasswordDto forget_PasswordDto)
         {
-            if (forget_PasswordDto == null)
-            {
-                throw new UnauthorizedAccessException("Please Enter the Values");
-            }
-
             var user = await _userDbContext.Tab_Register.SingleOrDefaultAsync(u => u.UserName == forget_PasswordDto.UserName);
              
             if (user == null)
             {
-                throw new UnauthorizedAccessException("Invalid UserName");
+                return null;
             }
-            return "link send to your mail Successfully";
-
+            else
+            {
+                return user;
+            }
         }
     }
 }

@@ -5,7 +5,7 @@
 
 //namespace usersAuthApi.Controllers
 //{
-//    [Route("api/[controller]")]
+//      [Route("[controller]")]
 //    [ApiController]
 //    public class PlayedGameController : ControllerBase
 //    {

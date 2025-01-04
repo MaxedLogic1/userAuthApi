@@ -5,9 +5,10 @@ namespace usersAuthApi.Repositories
 {
     public interface IAuthRepository
     {
-        Task<string> RegisterUserAsync(registerRequestDto registerDto);
+       
+        Task<UserModel> RegisterUserAsync(registerRequestDto registerDto);
         Task<loginResponseDto> LoginUserAsync(loginRequestDto loginDto);
-        Task<string> ForgetPasswordAsync(forgetPasswordDto forget_PasswordDto);
+        Task<UserModel> ForgetPasswordAsync(forgetPasswordDto forget_PasswordDto);
 
     }
 }

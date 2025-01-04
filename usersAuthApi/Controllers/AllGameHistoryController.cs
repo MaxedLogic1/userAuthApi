@@ -1,25 +1,25 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using usersAuthApi.ApplicationDbContext;
+using usersAuthApi.Exceptions;
 using usersAuthApi.Models.DTO;
 
 namespace usersAuthApi.Controllers
 {
-    [Route("Api/[controller]")]
+    [Route("[controller]")]
     [ApiController]
-    public class AllGameIndexController : ControllerBase
+    public class AllGameHistoryController : ControllerBase
     {
         private readonly userDbContext _userDbContext;
 
-        public AllGameIndexController(userDbContext userDbContext)
+        public AllGameHistoryController(userDbContext userDbContext) 
         {
             _userDbContext = userDbContext;
         }
 
         [HttpGet]
         [Route("{id}")]
-        public async Task<List<AllGameIndexRequestDto>> GetAllGamesForPlayer([FromRoute] int id)
+        public async Task<List<AllGameIndexRequestDto>> GetPlayerGameHistory([FromRoute] int id)
         {
             try
             {
@@ -27,7 +27,7 @@ namespace usersAuthApi.Controllers
 
                 if (playerId <= 0)
                 {
-                    throw new InvalidOperationException("Player ID is invalid or not found.");
+                    throw new PlayerNotFoundCustomException();
                 }
 
                 // Fetching HeadTail games for the player
@@ -44,7 +44,8 @@ namespace usersAuthApi.Controllers
                             EntryDate = h.EntryDate,
                             WinLoss = h.Type
                         })
-                    .ToListAsync();
+                        .OrderBy(game => game.EntryDate)
+                        .ToListAsync();
 
                 // Fetching Bubble games for the player
                 var bubbleGames = await _userDbContext.Tab_BubbleGameIndex
@@ -60,24 +61,44 @@ namespace usersAuthApi.Controllers
                             EntryDate = b.EntryDate,
                             WinLoss = b.Type
                         })
-                    .ToListAsync();
-
+                        .OrderBy(game => game.EntryDate)
+                         .ToListAsync();
+                // Fetching Bubble games for the player
+                var flappyBird = await _userDbContext.Tab_FlappyBirdGameIndex
+                   .Where(b => b.PId == playerId)
+                   .Join(
+                       _userDbContext.Tab_Games,
+                       b => b.GId,
+                       g => g.Id,
+                       (b, g) => new AllGameIndexRequestDto
+                       {
+                           GameName = g.Name,
+                           BetAmount = b.BetAmount,
+                           EntryDate = b.EntryDate,
+                           WinLoss = b.Type
+                       })
+                       .OrderBy(game => game.EntryDate)
+                        .ToListAsync();
                 // Combine both results
-                var allGames = headTailGames.Concat(bubbleGames).ToList();
+                var allGames = headTailGames.Concat(bubbleGames).Concat(flappyBird).ToList();
 
                 // If no games are found, throw custom exception
                 if (allGames == null || allGames.Count == 0)
                 {
-                    throw new InvalidOperationException("Game and Player not found.");
+                    throw new ArgumentException("Game and Player not found.");
 
                 }
 
                 return allGames;
             }
-            
-            catch (Exception)
+
+            catch (PlayerNotFoundCustomException)
             {
-                throw new InvalidOperationException("An unexpected error occurred while fetching games.");
+                throw new PlayerNotFoundCustomException("Player ID is invalid or not found.");
+            }
+            catch (GameNotFoundCustomException)
+            {
+                throw new GameNotFoundCustomException("Game ID is invalid or not found.");
             }
         }
 

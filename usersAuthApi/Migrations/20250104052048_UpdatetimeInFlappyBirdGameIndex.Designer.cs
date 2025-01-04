@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using usersAuthApi.ApplicationDbContext;
 
@@ -11,9 +12,11 @@ using usersAuthApi.ApplicationDbContext;
 namespace usersAuthApi.Migrations
 {
     [DbContext(typeof(userDbContext))]
-    partial class userDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250104052048_UpdatetimeInFlappyBirdGameIndex")]
+    partial class UpdatetimeInFlappyBirdGameIndex
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

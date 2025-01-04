@@ -1,11 +1,13 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using usersAuthApi.ApplicationDbContext;
+using usersAuthApi.Exceptions;
 using usersAuthApi.Models.DTO;
 using usersAuthApi.Repositories;
 
 namespace usersAuthApi.Controllers
 {
-    [Route("Api/[controller]")]
+    [Route("[controller]")]
     [ApiController]
     public class GamesController : ControllerBase
     {
@@ -14,87 +16,132 @@ namespace usersAuthApi.Controllers
         {
             _gameRepository = gameRepository;
         }
-
-        // Add New Game in Database
-        [HttpPost]
-        [Route("AddGame")]
-        public async Task<IActionResult> AddGame([FromForm] gameRequestDto gameRequestDto)
+        [HttpGet]
+        [Route("AllGames")]
+        public async Task<ActionResult<List<AllGamesResponseDto>>> GetAllGamesIndex()
         {
-            if (gameRequestDto == null)
-            {
-                throw new ArgumentNullException(nameof(gameRequestDto), "Model can't be null in Contorller");
-            }
-
             try
             {
-                var game = await _gameRepository.AddGameAsync(gameRequestDto);
-                return Ok(game);
+                var allGames = await _gameRepository.GetAllGamesIndexAsync();
+
+                if (allGames == null)
+                {
+                    return NotFound(new { Message = "No games found." });
+                }
+
+                return Ok(allGames);
             }
             catch (Exception ex)
             {
-                return BadRequest(ex.Message);
+                return StatusCode(500, new { Message = "An unexpected error occurred while processing the game data.", Error = ex.Message });
+            }
+        }
+
+        [HttpPost]
+        [Route("AddNewGame")]
+        public async Task<IActionResult> AddGame([FromForm] gameRequestDto gameRequestDto)
+        {
+            try
+            {
+                if (gameRequestDto == null)
+                {
+                    throw new GameNotFoundCustomException("Model does not null: ");
+                }
+                var game = await _gameRepository.AddGameAsync(gameRequestDto);
+                if(game != null)
+                {
+                    return Ok(new { Message = $"{gameRequestDto.Name} added successfull: " });
+                }
+                else
+                {
+                    return Ok(new { Message = $"{gameRequestDto.Name} already exist or not added : " });
+                }
+               
+            }
+            catch (GameNotFoundCustomException)
+            {
+                throw new GameNotFoundCustomException("Game does not exist : ");
             }
         }
 
 
-        // Get Game by Id in the Database
-        [HttpPost]
+        
+        [HttpGet]
         [Route("GetById/{id}")]
         public async Task<IActionResult> GetByIdAsync(int id)
         {
-            if(id <= 0)
-            {
-                return BadRequest("Invalid Game ID.");
-            }
+           
             try
             {
+                if (id == null||id <= 0)
+                {
+                    throw new GameNotFoundCustomException("Game does not exist: ");
+                }
                 var GetGame = await _gameRepository.GetByIdAsync(id);
-                return Ok(GetGame);
+                if (GetGame != null)
+                {
+                    return Ok(GetGame);
+                }
+                else
+                {
+                    return Ok(new { Message = $"{id} no game exists: " });
+                }
+                
             }
-            catch (Exception ex)
+            catch (GameNotFoundCustomException)
             {
-                return StatusCode(500, new { message = "An error occurred while Updating the game.", error = ex.Message });
+                throw new GameNotFoundCustomException("Game Not Found.");
             }
         }
 
 
 
-        // Update/Put Game by Id in the Database
+        
         [HttpPut]
         [Route("UpdateGame/{id}")]
-        public async Task<IActionResult> UpdateGame( int id, [FromForm] gameRequestDto requestDto)
+        public async Task<IActionResult> UpdateGame(int id, [FromForm] gameRequestDto requestDto)
         {
-            if (id == null)
+           
+            try
             {
-                return BadRequest("Invalid game data.");
+                if (id == null ||id <= 0)
+                {
+                    throw new GameNotFoundCustomException("Game id is invalid: ");
+                }
+                var gameExists = await _gameRepository.GetByIdAsync(id);
+                 
+                if (gameExists != null)
+                {
+                    var result = await _gameRepository.UpdateGameAsync(id, requestDto);
+                    var updatedGame = await _gameRepository.GetByIdAsync(id);
+                    return Ok(updatedGame); // Return the updated game
+                }
+                else
+                {
+                    return Ok(new { Message = $"{id} no game exists: " });
+                }
+            }
+            catch (GameNotFoundCustomException)
+            {
+                throw new GameNotFoundCustomException("No Game found ");
             }
 
-            var gameExists = await _gameRepository.GetByIdAsync(id);
-            if (gameExists == null)
-            {
-                return NotFound(new { message = "Game not found." });
-            }
 
-            var result = await _gameRepository.UpdateGameAsync(id, requestDto);
-
-            var updatedGame = await _gameRepository.GetByIdAsync(id);
-            return Ok(updatedGame); // Return the updated game
         }
 
-
-
-        // Delete Game by Id in the Database
+        
         [HttpDelete]
         [Route("DeleteGame/{id}")]
         public async Task<IActionResult> DeleteGame(int id)
         {
-            if (id <= 0)
-            {
-                return BadRequest("Invalid game ID.");
-            }
+           
 
             try
             {
+                if (id == null || id <= 0)
+                {
+                    throw new GameNotFoundCustomException("Id is invalid: ");
+                }
                 var result = await _gameRepository.DeleteGameAsync(id);
 
                 if (result)
@@ -106,9 +153,9 @@ namespace usersAuthApi.Controllers
                     return NotFound(new { message = "Game not found." });
                 }
             }
-            catch (Exception ex)
+            catch (GameNotFoundCustomException)
             {
-                return StatusCode(500, new { message = "An error occurred while deleting the game.", error = ex.Message });
+                throw new GameNotFoundCustomException("Game Not Found.");
             }
 
         }

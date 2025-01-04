@@ -15,10 +15,6 @@ namespace usersAuthApi.Repositories
         }
         public async Task<fundTransectionResponseDto> AddFundTransactionAsync(fundTransactionRequestDto requestDto)
         {
-            if (requestDto == null)
-            {
-                throw new ArgumentNullException(nameof(requestDto));
-            }
             //Add new Images
             if (requestDto.Image == null || requestDto.Image.Length == 0)
             {
@@ -66,13 +62,12 @@ namespace usersAuthApi.Repositories
                 CreditAmount = requestDto.CreditAmount,
                 Remark = requestDto.Remark,
                 Type = "Add Fund",
-                TransactionDate = DateTime.Now,
+                TransactionDate = DateTime.Now.AddMinutes(330),
                 Images = uniqueFileName,
                 TxNoId = $"TX_{new Random().Next(1000, 9999)}"
             };
 
             await _userDbContext.Tab_FundTransaction.AddAsync(fundTransaction);
-            //add amon
             await _userDbContext.SaveChangesAsync();
 
             decimal totalAmount = await _userDbContext.Tab_FundTransaction
@@ -89,8 +84,8 @@ namespace usersAuthApi.Repositories
                 Remark = fundTransaction.Remark,
                 TransactionDate = fundTransaction.TransactionDate,
                 Type = fundTransaction.Type,
-                TxNoId = fundTransaction.TxNoId,
-                Image = $"/userAuthApi/Images/{uniqueFileName}"
+               // TxNoId = fundTransaction.TxNoId,
+                //Image = $"/userAuthApi/Images/{uniqueFileName}"
             };
 
             return responseDto;

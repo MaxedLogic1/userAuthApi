@@ -6,8 +6,6 @@ namespace usersAuthApi.Repositories
     {
 
       Task<HeadTailGameResponseDto> HeadTailGameResponse(HeadTailGameReuestDto headTailGameReuestDto);
-
-
-        Task<List<HeadTailGameResponseDto>> MultiUserHeadTailGameResponse(HeadTailGameMultiUsersRequestDto headTailGameMultiUsersRequestDto);
+      Task<List<HeadTailGameResponseDto>> MultiUserHeadTailGameResponse(HeadTailGameMultiUsersRequestDto headTailGameMultiUsersRequestDto);
     }
 }

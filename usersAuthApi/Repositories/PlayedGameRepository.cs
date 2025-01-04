@@ -47,7 +47,7 @@
 //               .SumAsync(f => (decimal?)f.DebitAmount) ?? 0;
 
 //            decimal TotalAmount = creditAmount - debitAmount;
-            
+
 //            var newPlayGame = new BubbleGameIndexModel
 //            {
 //                RandomId = $"PGame_{new Random().Next(1000, 9999)}",
@@ -57,7 +57,7 @@
 //                WinLoss = playGameRequestDto.WinLoss,  
 //                Remark = $"Your Game Id: {playGameRequestDto.GId}, Your Player Id: {playGameRequestDto.PId}, Game: {game.Name}, Player: {player.UserName}", 
 //                IsActive = true, 
-//                EntryDate = DateTime.Now 
+//                EntryDate = DateTime.Now.AddMinutes(330) 
 //            };
 
 //           await _userDbContext.Tab_BubbleGameIndex.AddAsync(newPlayGame);

@@ -3,6 +3,7 @@ using System.Numerics;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using usersAuthApi.ApplicationDbContext;
+using usersAuthApi.Exceptions;
 using usersAuthApi.Models.Domain;
 using usersAuthApi.Models.DTO;
 
@@ -19,48 +20,19 @@ namespace usersAuthApi.Repositories
 
         public async Task<HeadTailGameResponseDto> HeadTailGameResponse(HeadTailGameReuestDto headTailGameReuestDto)
         {
-            if (headTailGameReuestDto == null)
-            {
-                throw new InvalidOperationException("HeadTail Model Can't be Null ?");
-            }
+            //Assign time to current time 
+            //headTailGameReuestDto.BetEntryDate = DateTime.Now.AddMinutes(330);
+
             //player is exsit
             var player = await _userDbContext.Tab_Register
               .Where(u => u.Id == headTailGameReuestDto.PId)
               .FirstOrDefaultAsync();
-            if (player == null)
-            {
-                throw new InvalidOperationException("Player not found.");
-            }
+             
 
             //find the game 
             var game = await _userDbContext.Tab_Games
                 .Where(g => g.Id == headTailGameReuestDto.GId)
                 .FirstOrDefaultAsync();
-            //check the game is null or not 
-            if (game == null)
-            {
-                throw new InvalidOperationException("Game not found.");
-            }
-
-            //Total Amount 
-            decimal totalAmount = await _userDbContext.Tab_FundTransaction
-                 .Where(f => f.PId == headTailGameReuestDto.PId)
-                 .GroupBy(f => 1)
-                 .Select(g => (decimal?)(g.Sum(f => (decimal?)f.CreditAmount) ?? 0) - (g.Sum(f => (decimal?)f.DebitAmount) ?? 0))
-                 .FirstOrDefaultAsync() ?? 0;
-
-            if (totalAmount <= headTailGameReuestDto.BetAmount)
-            {
-                return new HeadTailGameResponseDto
-                {
-                    BetAmount = headTailGameReuestDto.BetAmount,
-                    Message = "Minimum balance required.Atleast $ 10 required ",
-                    TotalAmount = totalAmount,
-                    EntryDate = DateTime.Now,
-                };
-            }
-            //headtailGame Logic 
-            bool isWin = headTailGameReuestDto.BetSide;
 
             decimal totalCreditAmount = await _userDbContext.Tab_FundTransaction
                               .Where(f => f.PId == headTailGameReuestDto.PId)
@@ -70,6 +42,10 @@ namespace usersAuthApi.Repositories
                               .Where(f => f.PId == headTailGameReuestDto.PId)
                               .SumAsync(f => (decimal?)f.DebitAmount) ?? 0;
 
+            //Bet side from frontend show be true of false
+            bool isWin = headTailGameReuestDto.BetSide;
+
+            // rendomly win user 
             isWin = new Random().Next(100) % 2 == 0;
             if (isWin == false)
             {
@@ -93,17 +69,29 @@ namespace usersAuthApi.Repositories
             //{
             //    isWin = false;
             //}
+
+            //Bet Amout from user / frontend 
             decimal betAmount = headTailGameReuestDto.BetAmount;
 
-            //Give the 20% of bet Amount to the user 
-            double winingAmount = 0.20;
+            //Profit Come From GameTable
+            //var profit = await _userDbContext.Tab_Games
+            //     .Where(g => g.Id == bubbleGameRequestDto.GId)
+            //     .Select(g => g.Profit)
+            //     .FirstOrDefaultAsync();
 
-            decimal resultAmount = isWin ? betAmount * (decimal)winingAmount : betAmount;
-
+            //Profit Percentage 
+            var profitPercent = await _userDbContext.Tab_Games
+               .Where(g => g.Id == headTailGameReuestDto.GId)
+               .Select(g => g.Percentage)
+               .FirstOrDefaultAsync();
+            
+            //assign result amount 
+            decimal resultAmount = isWin ? betAmount * profitPercent : betAmount;
 
             //Remark message to 
             string resultMessage = isWin ? $"Congratulations, You Win: {resultAmount}" : $"Sorry, You Lost: {resultAmount}";
-
+            string IsWin = isWin ? $"Win" : $"Loss";
+          var  totalAmount = totalCreditAmount - totalDebitAmount;
             //After win/loss Current amount
             totalAmount = isWin ? totalAmount + resultAmount : totalAmount - resultAmount;
 
@@ -116,7 +104,7 @@ namespace usersAuthApi.Repositories
                 DebitAmount = isWin ? 0 : resultAmount,
                 Remark = resultMessage,
                 Type = isWin ? "Win" : "Loss",
-                TransactionDate = DateTime.Now,
+                TransactionDate = DateTime.Now.AddMinutes(330),
                 TxNoId = $"TX_{new Random().Next(1000, 9999)}",
                 Images = null
             };
@@ -137,7 +125,7 @@ namespace usersAuthApi.Repositories
                 Type = isWin ? "win" : "loss",
                 Remark = $"Game: {game.Name}, Player: {player.UserName} ",
                 IsActive = true,
-                EntryDate = DateTime.Now
+                EntryDate = DateTime.Now.AddMinutes(330)
             };
 
             await _userDbContext.Tab_HeadTailGameIndex.AddAsync(newPlayGame);
@@ -152,9 +140,9 @@ namespace usersAuthApi.Repositories
                 PlayeName = player.Name,
                 GId = headTailGameReuestDto.GId,
                 GameName = game.Name,
-                Message = resultMessage,
+                Message = IsWin,
                 BetAmount = betAmount,
-                EntryDate = DateTime.Now,
+                EntryDate = DateTime.Now.AddMinutes(330),
                 TotalAmount = totalAmount
 
             };
@@ -163,17 +151,22 @@ namespace usersAuthApi.Repositories
 
         public async Task<List<HeadTailGameResponseDto>> MultiUserHeadTailGameResponse(HeadTailGameMultiUsersRequestDto headTailGameMultiUsersRequestDto)
         {
-          
+          //response Array to store all the user response 
             var responses = new List<HeadTailGameResponseDto>();
 
-            var currentTime = DateTime.Now;
+            //time to current time 
+            var currentTime = DateTime.Now.AddMinutes(330);
 
+            //sesstion start time 
             var sessionStartTime = new DateTime(currentTime.Year, currentTime.Month, currentTime.Day, currentTime.Hour, currentTime.Minute, 0);
-
+           
+            //sesstion end time 
             var sessionEndTime = sessionStartTime.AddMinutes(1).AddSeconds(-1);
 
+            //loop for check each player to and save there details 
             foreach (var betRequest in headTailGameMultiUsersRequestDto.Bets)
             {
+                //playe enter between session time
                 if (betRequest.BetEntryDate > sessionStartTime && betRequest.BetEntryDate < sessionEndTime)
                 {
                     // Player exists
@@ -182,13 +175,14 @@ namespace usersAuthApi.Repositories
                         .FirstOrDefaultAsync();
                     if (player == null)
                     {
+                        //add response to response Array
                         responses.Add(new HeadTailGameResponseDto
                         {
                             PId = betRequest.PId,
                             GId = betRequest.GId,
                             Message = "Player not found.",
                             BetAmount = betRequest.BetAmount,
-                            EntryDate = DateTime.Now,
+                            EntryDate = DateTime.Now.AddMinutes(330),
 
                         });
                         continue;
@@ -200,6 +194,7 @@ namespace usersAuthApi.Repositories
                         .FirstOrDefaultAsync();
                     if (game == null)
                     {
+                        //add response to responses Array
                         responses.Add(new HeadTailGameResponseDto
                         {
                             PId = betRequest.PId,
@@ -207,7 +202,7 @@ namespace usersAuthApi.Repositories
                             GId = betRequest.GId,
                             Message = "Game not found.",
                             BetAmount = betRequest.BetAmount,
-                            EntryDate = DateTime.Now,
+                            EntryDate = DateTime.Now.AddMinutes(330),
                         });
                         continue;
                     }
@@ -221,6 +216,7 @@ namespace usersAuthApi.Repositories
 
                     if (totalAmount <= betRequest.BetAmount)
                     {
+                        //Player Balance is less the betAmount
                         responses.Add(new HeadTailGameResponseDto
                         {
                             PId = betRequest.PId,
@@ -229,7 +225,7 @@ namespace usersAuthApi.Repositories
                             GameName = game.Name,
                             Message = "Minimum balance required. At least $10 required.",
                             BetAmount = betRequest.BetAmount,
-                            EntryDate = DateTime.Now,
+                            EntryDate = DateTime.Now.AddMinutes(330),
                             TotalAmount = totalAmount
                         });
                         continue;
@@ -254,9 +250,10 @@ namespace usersAuthApi.Repositories
                         PId = betRequest.PId,
                         CreditAmount = isWin ? resultAmount : 0,
                         DebitAmount = isWin ? 0 : resultAmount,
+                       
                         Remark = resultMessage,
                         Type = isWin ? "Win" : "Loss",
-                        TransactionDate = DateTime.Now,
+                        TransactionDate = DateTime.Now.AddMinutes(330),
                         TxNoId = $"TX_{new Random().Next(1000, 9999)}",
                         Images = null
                     };
@@ -270,13 +267,13 @@ namespace usersAuthApi.Repositories
                         PId = betRequest.PId,
                         GId = betRequest.GId,
                         BetAmount = betRequest.BetAmount,
-                        BetSide = betRequest.BetSide,
+                        BetSide = isWin ? true : false,
                         Win = isWin ? resultAmount : 0,
                         Loss = isWin ? 0 : resultAmount,
                         Type = isWin ? "Win" : "Loss",
                         Remark = $"Game: {game.Name}, Player: {player.UserName}",
                         IsActive = true,
-                        EntryDate = DateTime.Now
+                        EntryDate = DateTime.Now.AddMinutes(330)
                     };
 
                     await _userDbContext.Tab_HeadTailGameIndex.AddAsync(newPlayGame);
@@ -292,7 +289,7 @@ namespace usersAuthApi.Repositories
                         GameName = game.Name,
                         Message = resultMessage,
                         BetAmount = betRequest.BetAmount,
-                        EntryDate = DateTime.Now,
+                        EntryDate = DateTime.Now.AddMinutes(330),
                         TotalAmount = totalAmount
                     };
 
@@ -300,7 +297,7 @@ namespace usersAuthApi.Repositories
                 }
                 else
                 {
-
+                    //player not entred in the given session time
                     responses.Add(new HeadTailGameResponseDto
                     {
                         Message = "Session timeout: Bet placed outside the allowed 1 minute session.",
@@ -310,7 +307,6 @@ namespace usersAuthApi.Repositories
                 }
                
             }
-
             return responses;
         }
     }

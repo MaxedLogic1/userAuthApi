@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using usersAuthApi.ApplicationDbContext;
 
@@ -11,9 +12,11 @@ using usersAuthApi.ApplicationDbContext;
 namespace usersAuthApi.Migrations
 {
     [DbContext(typeof(userDbContext))]
-    partial class userDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250103072154_AddFlapplyBirdGameIndex")]
+    partial class AddFlapplyBirdGameIndex
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -153,8 +156,8 @@ namespace usersAuthApi.Migrations
                     b.Property<int>("TotalAchiveScore")
                         .HasColumnType("int");
 
-                    b.Property<TimeOnly>("TotalScoreTime")
-                        .HasColumnType("time");
+                    b.Property<DateTime>("TotalScoreTime")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("Type")
                         .IsRequired()
